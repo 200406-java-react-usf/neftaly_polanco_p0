@@ -2,11 +2,7 @@ import { Employee } from '../models/employee';
 import { CrudRepository } from './crud-repo';
 import Validator from '../util/validator';
 import {  
-    AuthenticationError, 
-    BadRequestError, 
     NotImplementedError, 
-    ResourceNotFoundError, 
-    ResourcePersistenceError,
     InternalServerError
 } from '../errors/errors';
 import { PoolClient } from 'pg';
