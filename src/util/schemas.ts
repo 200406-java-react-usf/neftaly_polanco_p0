@@ -6,17 +6,7 @@ export interface EmployeeSchema {
     last_name: string,
     birth_date: Date,
     hire_date: Date,
+    phone: string,
     email: string,
     role_name: string
-}
-
-export interface BookSchema {
-
-}
-
-export interface TransactionSchema {
-    
-}
-
-export interface AuthorSchema {
 }
