@@ -2,7 +2,6 @@ import { Employee } from '../models/employee';
 import { CrudRepository } from './crud-repo';
 import Validator from '../util/validator';
 import {  
-    NotImplementedError, 
     InternalServerError
 } from '../errors/errors';
 import { PoolClient } from 'pg';
@@ -22,12 +21,13 @@ export class EmployeeRepository implements CrudRepository<Employee> {
             ae.hire_date,
             ae.email,
             er.name as role_name
-        from Employees ae
-        join Roles er
-        on ae.role_id = er.id
+
+            from Employees ae
+            join Roles er
+            on ae.role_id = er.id
     `;
     
-
+    //getting all employees at once
     async getAll(): Promise<Employee[]> {
 
         let client: PoolClient;
@@ -44,6 +44,7 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         }
     }       
 
+    // getting employee by its id
     async getById(id: number): Promise<Employee> {
         let client: PoolClient;
         try {
@@ -57,7 +58,8 @@ export class EmployeeRepository implements CrudRepository<Employee> {
             client && client.release();
         }    
     }
-
+    
+    //getting employee by unique key such as username or email;
     async getEmployeeByUniqueKey(key: string, val: string): Promise<Employee> {
         let client: PoolClient;
         
