@@ -73,6 +73,7 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         }
     }
 
+   //getting Employee by its credentials
     async getEmployeeByCredentials(un: string, pw: string) {
         
        let client: PoolClient;
@@ -90,10 +91,11 @@ export class EmployeeRepository implements CrudRepository<Employee> {
     
     }
 
+    //adding a new employee
    async save(newEmployee: Employee): Promise<Employee> {
             
         let client: PoolClient;
-
+        
         try {
             client = await connectionPool.connect();
 
@@ -122,6 +124,7 @@ export class EmployeeRepository implements CrudRepository<Employee> {
     async update(updatedEmployee: Employee): Promise<boolean> {
         
         let client: PoolClient;
+        let queryKeys = Object.keys(updatedEmployee);
 
         try {
             client = await connectionPool.connect();
@@ -135,22 +138,27 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         }
     }
 
-    deleteById(id: number): Promise<boolean> {
+    async deleteById(id: number): Promise<boolean> {
 
-        return new Promise<boolean>((resolve, reject) => {
+        let client: PoolClient;
             
-            if (!Validator.isValidId(id)) {
-                reject(new BadRequestError());
-            }
+         try {
+             client = await connectionPool.connect();
+             let sql = '';
+             let rs = await client.query(sql, []);
+             return true;
 
-            reject(new NotImplementedError());
-        });
+         } catch (e) {
+
+         } finally {
+             client && client.release();
+         }
     }
 
-    private removePassword(employee: Employee): Employee {
-        let emp = {...employee};
-        delete emp.password;
-        return emp;   
-    }
+    // private removePassword(employee: Employee): Employee {
+    //     let emp = {...employee};
+    //     delete emp.password;
+    //     return emp;   
+    // }
 
 }
