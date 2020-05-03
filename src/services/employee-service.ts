@@ -18,5 +18,11 @@ export class EmployeeService {
         return emps.map(this.removePassword);
     }
 
+    private removePassword(employee: Employee): Employee {
+        if (!employee|| !employee.password) return employee;
+        let emp = {...employee};
+        delete emp.password;
+    }
+
 
 }
