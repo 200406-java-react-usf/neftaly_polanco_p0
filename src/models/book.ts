@@ -1,17 +1,22 @@
 export class Book {
     id: number;
-    title: string;
+    title: string;    
+    stock: number;
+    price: number;
     genres: string;
-    authorId: number;
-    inStock: number;
-    buyers: string;   
+    authors: string[];
+    buyers: string    
+    transactionId: number;
 
-    constructor(id: number, title: string, writerId: number, genres: string, status: number, buyers: string, pub: string, pd: Date) {
+    constructor(id: number, title: string, amount: number, price: number, genres: string, writers: string[], buyers: string, tid: number) {
         this.id = id;
         this.title = title;
-        this.authorId = writerId;
+        this.stock = amount; 
+        this.price = price;   
         this.genres = genres;
-        this.inStock = status;
-        this.buyers = readers;        
+        this.authors = writers;
+        this.buyers = buyers;
+        this.transactionId = tid;
+   
     }
 }
