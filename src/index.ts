@@ -12,7 +12,6 @@ import { AuthorRouter } from './routers/author-router';
 import { sessionMiddleware } from './middleware/session-middleware';
 import { corsFilter } from './middleware/cors-filter';
 import { Pool } from 'pg';
-import { fork } from 'child_process';
 
 
 //environment config

@@ -5,7 +5,7 @@ import {
 } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
-import { mapAuthorResultSet } from '../util/result-set-mapper';
+import { mapAuthorResultSet } from '../util/author-result-set-mapper';
 
 export class AuthorRepository implements CrudRepository<Author> {
 

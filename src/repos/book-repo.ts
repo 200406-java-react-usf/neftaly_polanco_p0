@@ -10,7 +10,7 @@ import {
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
 //import map result set
-import { mapBookResultSet } from '../util/result-set-mapper';
+import { mapBookResultSet } from '../util/book-result-set-mapper';
 
 //create book repository
 export class BookRepository implements CrudRepository<Book> {

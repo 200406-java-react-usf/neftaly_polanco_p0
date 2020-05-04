@@ -1,12 +1,11 @@
 import { Employee } from '../models/employee';
 import { CrudRepository } from './crud-repo';
-import Validator from '../util/validator';
 import {  
     InternalServerError
 } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
-import { mapEmployeeResultSet } from '../util/result-set-mapper';
+import { mapEmployeeResultSet } from '../util/employee-result-set-mapper';
 
 export class EmployeeRepository implements CrudRepository<Employee> {
 
@@ -18,7 +17,6 @@ export class EmployeeRepository implements CrudRepository<Employee> {
             ae.first_name,
             ae.lastname,
             ae.birth_date,
-            ae.hire_date,
             ae.email,
             er.name as role_name
 
@@ -101,11 +99,11 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         try {
             client = await connectionPool.connect();
 
-            let role_id = (await client.query('select id from Rloes where role_name = $1', [newEmployee.role])).rows[0].id;
+            let role_id = (await client.query('select id from Roles where role_name = $1', [newEmployee.role])).rows[0].id;
 
             let sql = `insert into Employees (first_name, last_name, username, 
                 password, birthdate, phone, email, role_id) 
-                values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`;
+                values ($1, $2, $3, $4, $5, $6, $7, $8) returning id` ;
 
             let rs = (await client.query(sql, [newEmployee.username, newEmployee.password, 
                 newEmployee.firstName, newEmployee.lastName, newEmployee.birthdate, 
