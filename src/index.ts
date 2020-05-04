@@ -1,6 +1,19 @@
 import dotenv from 'dotenv';
-import { Pool } from 'pg';
+import fs, { mkdir } from 'fs';
 import express from 'express';
+import morgan from 'morgan';
+import path from 'path';
+
+import { EmployeeRouter } from './routers/employee-router';
+import { AuthRouter } from './routers/auth-router';
+import { BookRouter } from './routers/book-router';
+import { CustomerRouter } from './routers/customer-router';
+import { AuthorRouter } from './routers/author-router';
+import { sessionMiddleware } from './middleware/session-middleware';
+import { corsFilter } from './middleware/cors-filter';
+import { Pool } from 'pg';
+import { fork } from 'child_process';
+
 
 //environment config
 dotenv.config();
@@ -15,10 +28,22 @@ export const connectionPool: Pool = new Pool({
     max: 5
 });
 
+//loggin config
+fs.mkdir(`${__dirname}/logs`, () => {});
+const logStream = fs.createWriteStream(path.join
+    (__dirname, 'logs/access.log'), { flags: 'a'});
+
 //webserver config
 const app = express();
-
+app.use(morgan('combined', { stream: logStream}));
+app.use(sessionMiddleware);
+app.use(corsFilter);
 app.use('/', express.json());
+app.use('/employees', EmployeeRouter);
+app.use('/books', BookRouter);
+app.use('/authors', AuthorRouter);
+app.use('/customers', CustomerRouter);
+app.use('/auth', AuthRouter)
 
 app.listen(8080, () => {
     console.log('Application running and listening at: http://localhost:8080');
