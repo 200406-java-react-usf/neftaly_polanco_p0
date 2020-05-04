@@ -1,7 +1,7 @@
 import { Employee } from "../models/employee";
 import { EmployeeRepository } from "../repos/employee-repo";
-import { ResourceNotFoundError, BadRequestError } from "../errors/errors";
-import { isValidId, isEmptyObject, isPropertyOf } from "../util/validator";
+import { ResourceNotFoundError, BadRequestError, ResourcePersistenceError, AuthenticationError } from "../errors/errors";
+import { isValidId, isEmptyObject, isPropertyOf, isValidObject, isValidStrings } from "../util/validator";
 
 
 
@@ -64,15 +64,96 @@ export class EmployeeService {
 
             return this.removePassword(emp);
 
-    } catch (e) {
+        } catch (e) {
         throw e;
+        }
     }
+    async authenticateUser(un: string, pw: string): Promise<Employee> {
+
+        try {
+
+            if (!isValidStrings(un, pw)) {
+                throw new BadRequestError();
+            }
+
+            let authEmp: Employee;
+            
+            authEmp = await this.empRepo.getEmployeeByCredentials(un, pw);
+           
+
+            if (isEmptyObject(authEmp)) {
+                throw new AuthenticationError('Bad credentials provided.');
+            }
+
+            return this.removePassword(authEmp);
+
+        } catch (e) {
+            throw e;
+        }
+
     }
+
+    async addNewEmployee(newEmp: Employee): Promise<Employee> {
+        
+        try {
+
+            if (!isValidObject(newEmp, 'id')) {
+                throw new BadRequestError('Invalid property values found in provided employee.');
+            }
+
+            let usernameAvailable = await this.isUsernameAvailable(newEmp.username);
+
+            if (!usernameAvailable) {
+                throw new ResourcePersistenceError('The provided username is already taken.');
+            }
+        
+            let emailAvailable = await this.isEmailAvailable(newEmp.email);
+    
+            if (!emailAvailable) {
+                throw new  ResourcePersistenceError('The provided email is already taken.');
+            }
+
+            newEmp.role = 'staff'; // all new registers have 'staff' role by default
+            const persistedEmployee = await this.empRepo.save(newEmp);
+
+            return this.removePassword(persistedEmployee);
+
+        } catch (e) {
+            throw e
+        }
+
+    }
+
+    private async isUsernameAvailable(username: string): Promise<boolean> {
+
+        try {
+            await this.getEmployeeByUniqueKey({'username': username});
+        } catch (e) {
+            console.log('username is available')
+            return true;
+        }
+
+        console.log('username is unavailable')
+        return false;
+
+    }
+
+    private async isEmailAvailable(email: string): Promise<boolean> {
+        
+        try {
+            await this.getEmployeeByUniqueKey({'email': email});
+        } catch (e) {
+            console.log('email is available')
+            return true;
+        }
+
+        console.log('email is unavailable')
+        return false;
+    }
+
     private removePassword(employee: Employee): Employee {
         if (!employee|| !employee.password) return employee;
         let emp = {...employee};
         delete emp.password;
     }
-
-
 }
