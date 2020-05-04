@@ -35,17 +35,36 @@ export class AuthorService {
 
         return  author;
     }
+        //adding new author
+        async addNewAuthor(newAuthor: Author): Promise<Author> {
+        
+            try {
+    
+                //making sure newAuthor object is valid
+                if (!isValidObject(newAuthor, 'id')) {
+                    throw new BadRequestError('Invalid property values found in provided author.');
+                }
+                
+                const persistedAuthor = await this.authorRepo.save(newAuthor);
+    
+                return persistedAuthor;
+    
+            } catch (e) {
+                throw e
+            }
+    
+        }
 
     //update an existing author
-    async updateCustomer(updatedCustomer: Author): Promise<boolean> {
+    async updateAuthor(updatedAuthor: Author): Promise<boolean> {
         
         try {
 
-            if (!isValidObject(updatedCustomer)) {
+            if (!isValidObject(updatedAuthor)) {
                 throw new BadRequestError('Invalid user provided (invalid values found).');
             }
 
-            return await this.authorRepo.update(updatedCustomer);
+            return await this.authorRepo.update(updatedAuthor);
         } catch (e) {
             throw e;
         }
