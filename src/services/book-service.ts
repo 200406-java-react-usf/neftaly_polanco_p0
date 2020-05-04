@@ -36,16 +36,36 @@ export class BookService {
         return  book;
     }
 
+        //adding new book
+        async addNewBook(newBook: Book): Promise<Book> {
+        
+            try {
+    
+                //making sure newBook object is valid
+                if (!isValidObject(newBook, 'id')) {
+                    throw new BadRequestError('Invalid property values found in provided book.');
+                }                
+               
+                const persistedBook = await this.bookRepo.save(newBook);
+    
+                return persistedBook;
+    
+            } catch (e) {
+                throw e
+            }
+    
+        }
+        
     //update an existing book
-    async updateCustomer(updatedCustomer: Book): Promise<boolean> {
+    async updateBook(updatedBook: Book): Promise<boolean> {
         
         try {
 
-            if (!isValidObject(updatedCustomer)) {
+            if (!isValidObject(updatedBook)) {
                 throw new BadRequestError('Invalid user provided (invalid values found).');
             }
 
-            return await this.bookRepo.update(updatedCustomer);
+            return await this.bookRepo.update(updatedBook);
         } catch (e) {
             throw e;
         }
