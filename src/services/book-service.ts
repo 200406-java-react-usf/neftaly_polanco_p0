@@ -1,7 +1,7 @@
 import { Book } from "../models/book";
 import { BookRepository } from "../repos/book-repo";
 import { ResourceNotFoundError, BadRequestError, ResourcePersistenceError, AuthenticationError } from "../errors/errors";
-import { isValidId, isEmptyObject, isValidObject,  } from "../util/validator";
+import { isValidId, isEmptyObject, isValidObject, isPropertyOf } from "../util/validator";
 
 
 
@@ -28,7 +28,7 @@ export class BookService {
 
         let book = await this.bookRepo.getById(id);
 
-        //ensuring we did not get an empty object
+        //ensuring we did not get an bookty object
         if(isEmptyObject(book)) {
             throw new ResourceNotFoundError();
         }
@@ -55,6 +55,42 @@ export class BookService {
             }
     
         }
+        //getting book by unique keys
+    async getBookByUniqueKey(queryObj: any): Promise<Book> {
+
+        try {
+            let queryKeys = Object.keys(queryObj);
+
+            if(!queryKeys.every(key => isPropertyOf(key, Book))) {
+                throw new BadRequestError();
+            }
+
+            //searching by only one key (at least for now)
+            let key = queryKeys[0];
+            let val = queryObj[key];
+
+            //reuse getById logic if given key is id
+            if (key === 'id') {
+                return await this.getBookById(+val);
+            }
+
+            // throw error if key is value is not valid
+            if(!isValidId(val)) {
+                throw new BadRequestError();
+            }
+
+            let book = await this.bookRepo.getBookByUniqueKey(key, val);
+            
+            if(isEmptyObject(book)) {
+                throw new ResourceNotFoundError();
+            }
+
+            return book;
+
+        } catch (e) {
+        throw e;
+        }
+    }
         
     //update an existing book
     async updateBook(updatedBook: Book): Promise<boolean> {
@@ -73,7 +109,7 @@ export class BookService {
     }
 
     //deleting a book
-    async deleteById(id: number): Promise<boolean> {
+    async deleteBookById(id: number): Promise<boolean> {
         
         try {
            

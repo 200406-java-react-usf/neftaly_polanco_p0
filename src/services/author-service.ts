@@ -1,7 +1,7 @@
 import { Author } from "../models/author";
 import { AuthorRepository } from "../repos/author-repo";
 import { ResourceNotFoundError, BadRequestError, ResourcePersistenceError, AuthenticationError } from "../errors/errors";
-import { isValidId, isEmptyObject, isValidObject,  } from "../util/validator";
+import { isValidId, isEmptyObject, isValidObject, isPropertyOf,  } from "../util/validator";
 
 
 
@@ -55,6 +55,42 @@ export class AuthorService {
     
         }
 
+        async getAuthorByUniqueKey(queryObj: any): Promise<Author> {
+
+            try {
+                let queryKeys = Object.keys(queryObj);
+    
+                if(!queryKeys.every(key => isPropertyOf(key, Author))) {
+                    throw new BadRequestError();
+                }
+    
+                //searching by only one key (at least for now)
+                let key = queryKeys[0];
+                let val = queryObj[key];
+    
+                //reuse getById logic if given key is id
+                if (key === 'id') {
+                    return await this.getAuthorById(+val);
+                }
+    
+                // throw error if key is value is not valid
+                if(!isValidId(val)) {
+                    throw new BadRequestError();
+                }
+    
+                let author = await this.authorRepo.getAuthorByUniqueKey(key, val);
+                
+                if(isEmptyObject(author)) {
+                    throw new ResourceNotFoundError();
+                }
+    
+                return author;
+    
+            } catch (e) {
+            throw e;
+            }
+        }
+
     //update an existing author
     async updateAuthor(updatedAuthor: Author): Promise<boolean> {
         
@@ -72,7 +108,7 @@ export class AuthorService {
     }
 
     //deleting an author
-    async deleteById(id: number): Promise<boolean> {
+    async deleteAuthorById(id: number): Promise<boolean> {
         
         try {
            

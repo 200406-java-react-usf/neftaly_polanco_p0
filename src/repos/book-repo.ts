@@ -17,26 +17,8 @@ export class BookRepository implements CrudRepository<Book> {
 
     baseQuery = `
         select *
-
-        from Books b
-        join Copies_Sold cs
-        on b.id = cs.book_id
-
-        join Transactions t
-        on cs.transaction_id = t.id
-
-        join Written_By wb
-        on b.id = wb.book_id
-
-        join Authors au
-        on wb.author_id = au.id
-
-        join Book_Genres bg
-        on b.id = bg.book_id
-
-        join Genres g
-        on bg.genre_id = g.id
-    `;
+        from Books 
+        `;
 
     //get all books
     async getAll(): Promise<Book[]> {
@@ -102,6 +84,22 @@ export class BookRepository implements CrudRepository<Book> {
             client && client.release();
         }
     
+    }
+
+    //getting Book by unique key such as phone or email;
+    async getBookByUniqueKey(key: string, val: string): Promise<Book> {
+        let client: PoolClient;
+        
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where ae.${key} = $1`;
+            let rs = await client.query(sql, [val]);
+            return mapBookResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
     }
 
     //update book work in progress

@@ -74,6 +74,22 @@ export class AuthorRepository implements CrudRepository<Author> {
     
     }
 
+    //getting Author by unique key such as phone or email;
+    async getAuthorByUniqueKey(key: string, val: string): Promise<Author> {
+        let client: PoolClient;
+        
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where ae.${key} = $1`;
+            let rs = await client.query(sql, [val]);
+            return mapAuthorResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    }
+
     //update an existing author
 
     async update(updatedAuthor: Author): Promise<boolean> {

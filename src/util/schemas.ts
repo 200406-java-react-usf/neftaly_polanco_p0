@@ -1,10 +1,10 @@
-export interface EmployeeSchema {
+export interface UserSchema {
     id: number,
     username: string,
     password: string,
     first_name: string,
     last_name: string,
-    birth_date: Date,
+    birthdate: Date,
     hire_date: Date,
     phone: string,
     email: string,
@@ -30,16 +30,9 @@ export interface AuthorSchema {
     bookswritten: string[]
 }
 
-export interface CustomerSchema {
+export interface TransactionSchema {
     id: number;
-    firstName: string;
-    lastName: string;
-	birthdate: Date;
-    phone: string;
-    email: string;
-	address: string;
-	city: string;
-	state: string;
-	zipCode: number;
-    booksLog: string;
+    username: string;
+    total: number;
+	transaction_date: Date;    
 }

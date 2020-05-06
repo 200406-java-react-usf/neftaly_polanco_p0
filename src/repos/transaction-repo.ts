@@ -1,19 +1,19 @@
-import { Customer } from '../models/customer';
+import { Transaction } from '../models/transaction';
 import { CrudRepository } from './crud-repo';
 import { 
     InternalServerError
 } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
-import { mapCustomerResultSet } from '../util/customer-result-set-mapper';
+import { mapTransactionResultSet } from '../util/transactions';
 
-export class CustomerRepository implements CrudRepository<Customer> {
+export class TransactionRepository implements CrudRepository<Transaction> {
 
     baseQuery = `
-        select * from Customers
+        select * from Transactions tr
     `;
-    // get all customers
-    async getAll(): Promise<Customer[]> {
+    // get all transactions
+    async getAll(): Promise<Transaction[]> {
 
         let client: PoolClient;
 
@@ -21,7 +21,7 @@ export class CustomerRepository implements CrudRepository<Customer> {
             client = await connectionPool.connect();
             let sql = `${this.baseQuery}`;
             let rs = await client.query(sql); // rs = ResultSet
-            return rs.rows.map(mapCustomerResultSet);
+            return rs.rows.map(mapTransactionResultSet);
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -30,16 +30,16 @@ export class CustomerRepository implements CrudRepository<Customer> {
     
     }
 
-    //get customer by id
-    async getById(id: number): Promise<Customer> {
+    //get transaction by id
+    async getById(id: number): Promise<Transaction> {
 
         let client: PoolClient;
 
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where cu.id = $1`;
+            let sql = `${this.baseQuery} where tr.id = $1`;
             let rs = await client.query(sql, [id]);
-            return mapCustomerResultSet(rs.rows[0]);
+            return mapTransactionResultSet(rs.rows[0]);
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -47,25 +47,25 @@ export class CustomerRepository implements CrudRepository<Customer> {
         }
     }
 
-    //add a new customer
-    async save(newCustomer: Customer): Promise<Customer> {
+    //add a new transaction
+    async save(newTransaction: Transaction): Promise<Transaction> {
             
         let client: PoolClient;
 
         try {
             client = await connectionPool.connect();
+
+            let total = 'sel'
            
-            let sql = `
-                insert into Customers (first_name, last_name, phone, email, address, city, state, zip_code) 
-                values ($1, $2, $3, $4, $5, $6, $7, $8) returning id
+            let sql = `  
+                insert into Transactions (total, username) where id = 
+                values ($1, $2) returning id
             `;
-            let rs = await client.query(sql, [newCustomer.firstName, newCustomer.lastName, 
-                newCustomer.phone, newCustomer.email, newCustomer.address, newCustomer.city, 
-                newCustomer.state, newCustomer.zipCode]);
+            let rs = await client.query(sql, [newTransaction.total, newTransaction.username]);
             
-            newCustomer.id = rs.rows[0].id;
+            newTransaction.id = rs.rows[0].id;
             
-            return newCustomer;
+            return newTransaction;
 
         } catch (e) {
             console.log(e);
@@ -76,15 +76,15 @@ export class CustomerRepository implements CrudRepository<Customer> {
     
     }
 
-     //getting Customer by unique key such as phone or email;
-     async getCustomerByUniqueKey(key: string, val: string): Promise<Customer> {
+     //getting Transaction by unique key such as phone or email;
+     async getTransactionByUniqueKey(key: string, val: string): Promise<Transaction> {
         let client: PoolClient;
         
         try {
             client = await connectionPool.connect();
             let sql = `${this.baseQuery} where ae.${key} = $1`;
             let rs = await client.query(sql, [val]);
-            return mapCustomerResultSet(rs.rows[0]);
+            return mapTransactionResultSet(rs.rows[0]);
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -92,14 +92,14 @@ export class CustomerRepository implements CrudRepository<Customer> {
         }
     }
 
-    //update an existing customer
-    async update(updatedCustomer: Customer): Promise<boolean> {
+    //update an existing transaction
+    async update(updatedTransaction: Transaction): Promise<boolean> {
         
         let client: PoolClient;
 
         try {
             client = await connectionPool.connect();
-            let sql = `update Customers where cu.id = $1 values `;
+            let sql = `update Transactions where tr.id = $1 values `;
             let rs = await client.query(sql, []);
             return true;
         } catch (e) {
@@ -110,14 +110,14 @@ export class CustomerRepository implements CrudRepository<Customer> {
     
     }
     
-    //delete customer
+    //delete transaction
     async deleteById(id: number): Promise<boolean> {
 
         let client: PoolClient;
 
         try {
             client = await connectionPool.connect();
-            let sql = `delete from Customers where id = $1`;
+            let sql = `delete from Transactions where tr.id = $1`;
             await client.query(sql, []);
             return true;
         } catch (e) {

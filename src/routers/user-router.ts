@@ -3,61 +3,60 @@ import express from 'express';
 import AppConfig from '../config/app';
 import { isEmptyObject } from '../util/validator';
 import { ParsedUrlQuery } from 'querystring';
-import { UserGuard } from '../middleware/auth-middleware';
+import { adminGuard } from '../middleware/auth-middleware';
 
+export const UserRouter = express.Router();
 
-export const BookRouter = express.Router();
+const userService = AppConfig.userService;
 
-const bookService = AppConfig.bookService;
-
-BookRouter.get('', async (req, resp) => {
+UserRouter.get('', adminGuard, async (req, resp) => {
 
     try {
-         
+
         let reqURL = url.parse(req.url, true);
 
         if(!isEmptyObject<ParsedUrlQuery>(reqURL.query)) {
-            let payload = await bookService.getBookByUniqueKey({...reqURL.query});
+            let payload = await userService.getUserByUniqueKey({...reqURL.query});
             resp.status(200).json(payload);
-       } else {
-            let payload = await bookService.getAllBooks();
+        } else {
+            let payload = await userService.getAllUsers();
             resp.status(200).json(payload);
         }
-        
+
     } catch (e) {
         resp.status(e.statusCode).json(e);
     }
 
 });
 
-BookRouter.get('/:id', async (req, resp) => {
+UserRouter.get('/:id', async (req, resp) => {
     const id = +req.params.id;
     try {
-        let payload = await bookService.getBookById(id);
+        let payload = await userService.getUserById(id);
         return resp.status(200).json(payload);
     } catch (e) {
         return resp.status(e.statusCode).json(e);
     }
 });
 
-BookRouter.post('', UserGuard, async (req, resp) => {
+UserRouter.post('', async (req, resp) => {
 
-    console.log('POST REQUEST RECEIVED AT /books');
+    console.log('POST REQUEST RECEIVED AT /users');
     console.log(req.body);
     try {
-        let newBook = await bookService.addNewBook(req.body);
-        return resp.status(201).json(newBook);
+        let newUser = await userService.addNewUser(req.body);
+        return resp.status(201).json(newUser);
     } catch (e) {
         return resp.status(e.statusCode).json(e);
     }
 
 });
 
-BookRouter.delete('/id', UserGuard, async (req, resp) => {
+UserRouter.delete('/id', adminGuard, async (req, resp) => {
     const id = +req.params.id;
     try {
-        let deletebook = await bookService.deleteBookById(id);
-        return resp.status(200).send(deletebook);
+        let deleteUser = await userService.deleteUserById(id);
+        return resp.status(200).send(deleteUser);
     } catch (e) {
         return resp.status(e.statusCode).json(e);
     }

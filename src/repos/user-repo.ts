@@ -1,32 +1,34 @@
-import { Employee } from '../models/employee';
+import { User } from '../models/user';
 import { CrudRepository } from './crud-repo';
 import {  
-    InternalServerError
+    InternalServerError, BadRequestError
 } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
-import { mapEmployeeResultSet } from '../util/employee-result-set-mapper';
+import { mapUserResultSet } from '../util/user-result-set-mapper';
+import { isPropertyOf } from '../util/validator';
 
-export class EmployeeRepository implements CrudRepository<Employee> {
+export class UserRepository implements CrudRepository<User> {
 
     baseQuery = `
-        select
-            ae.id,
-            ae.username,
-            ae.password,
-            ae.first_name,
-            ae.lastname,
-            ae.birth_date,
-            ae.email,
-            er.name as role_name
-
-            from Employees ae
-            join Roles er
-            on ae.role_id = er.id
+        select 
+            user.id,
+            user.username,
+            user.password,
+            user.first_name,
+            user.last_name,
+            user.birthdate,
+            user.hire_date,
+            user.phone,
+            user.email,
+        ro.role_name as role_name
+        from users user 
+        join roles ro 
+        on user.role_id = ro.id         
     `;
     
-    //getting all employees at once
-    async getAll(): Promise<Employee[]> {
+    //getting all users at once
+    async getAll(): Promise<User[]> {
 
         let client: PoolClient;
 
@@ -34,7 +36,7 @@ export class EmployeeRepository implements CrudRepository<Employee> {
             client = await connectionPool.connect();
             let sql = `${this.baseQuery}`;
             let rs = await client.query(sql); //rs stands for ResultSet
-            return rs.rows.map(mapEmployeeResultSet);
+            return rs.rows.map(mapUserResultSet);
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -42,14 +44,14 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         }
     }       
 
-    // getting employee by its id
-    async getById(id: number): Promise<Employee> {
+    // getting user by its id
+    async getById(id: number): Promise<User> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where ae.id = $1`;
+            let sql = `${this.baseQuery} where user.id = $1`;
             let rs = await client.query(sql, [id]);
-            return mapEmployeeResultSet(rs.rows[0]);
+            return mapUserResultSet(rs.rows[0]);
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -57,15 +59,15 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         }    
     }
     
-    //getting employee by unique key such as username or email;
-    async getEmployeeByUniqueKey(key: string, val: string): Promise<Employee> {
+    //getting user by unique key such as username or email;
+    async getUserByUniqueKey(key: string, val: string): Promise<User> {
         let client: PoolClient;
         
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where ae.${key} = $1`;
+            let sql = `${this.baseQuery} where user.${key} = $1`;
             let rs = await client.query(sql, [val]);
-            return mapEmployeeResultSet(rs.rows[0]);
+            return mapUserResultSet(rs.rows[0]);
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -73,16 +75,16 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         }
     }
 
-   //getting Employee by its credentials
-    async getEmployeeByCredentials(un: string, pw: string) {
+   //getting User by its credentials
+    async getUserByCredentials(un: string, pw: string) {
         
        let client: PoolClient;
 
        try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where ae.username = $1 and ae.password = $2`;
+            let sql = `${this.baseQuery} where user.username = $1 and user.password = $2`;
             let rs = await client.query(sql, [un, pw]);
-            return mapEmployeeResultSet(rs.rows[0]);
+            return mapUserResultSet(rs.rows[0]);
        } catch (e) {
            throw new InternalServerError();
        } finally {
@@ -91,27 +93,27 @@ export class EmployeeRepository implements CrudRepository<Employee> {
     
     }
 
-    //adding a new employee
-   async save(newEmployee: Employee): Promise<Employee> {
+    //adding a new user
+   async save(newUser: User): Promise<User> {
             
         let client: PoolClient;
         
         try {
             client = await connectionPool.connect();
 
-            let role_id = (await client.query('select id from Roles where role_name = $1', [newEmployee.role])).rows[0].id;
+            let role_id = (await client.query('select id from Roles where role_name = $1', [newUser.role_name])).rows[0].id;
 
-            let sql = `insert into Employees (first_name, last_name, username, 
+            let sql = `insert into Users (first_name, last_name, username, 
                 password, birthdate, phone, email, role_id) 
                 values ($1, $2, $3, $4, $5, $6, $7, $8) returning id` ;
 
-            let rs = (await client.query(sql, [newEmployee.username, newEmployee.password, 
-                newEmployee.firstName, newEmployee.lastName, newEmployee.birthdate, 
-                newEmployee.phone, newEmployee.email, role_id]));
+            let rs = (await client.query(sql, [newUser.username, newUser.password, 
+                newUser.firstName, newUser.lastName, newUser.birthdate, 
+                newUser.phone, newUser.email, role_id]));
 
-            newEmployee.id = rs.rows[0].id;
+            newUser.id = rs.rows[0].id;
 
-            return newEmployee;
+            return newUser;
 
         } catch (e) {
             throw new InternalServerError();
@@ -121,15 +123,18 @@ export class EmployeeRepository implements CrudRepository<Employee> {
     
     }
 
-    async update(updatedEmployee: Employee): Promise<boolean> {
+    async update(updatedUser: User): Promise<boolean> {
         
         let client: PoolClient;
-        let queryKeys = Object.keys(updatedEmployee);
+        let queryKeys = Object.keys(updatedUser);
+        if(!queryKeys.every(key => isPropertyOf(key, User))) {
+            throw new BadRequestError();
+        }
 
         try {
             client = await connectionPool.connect();
-            let sql = `update Employees set`;
-            let rs = await client.query(sql, []);
+            let sql = `update Users set $1 = $2 where id = $3`;
+            let rs = await client.query(sql, [queryKeys, updatedUser, updatedUser.id]);
             return true;
         } catch (e) {
             throw new InternalServerError();
@@ -155,10 +160,10 @@ export class EmployeeRepository implements CrudRepository<Employee> {
          }
     }
 
-    // private removePassword(employee: Employee): Employee {
-    //     let emp = {...employee};
-    //     delete emp.password;
-    //     return emp;   
+    // private removePassword(user: User): User {
+    //     let user = {...user};
+    //     delete user.password;
+    //     return user;   
     // }
 
 }

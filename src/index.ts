@@ -4,10 +4,10 @@ import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
 
-import { EmployeeRouter } from './routers/employee-router';
+import { UserRouter } from './routers/user-router';
 import { AuthRouter } from './routers/auth-router';
 import { BookRouter } from './routers/book-router';
-import { CustomerRouter } from './routers/customer-router';
+import { TransactionRouter } from './routers/transaction-router';
 import { AuthorRouter } from './routers/author-router';
 import { sessionMiddleware } from './middleware/session-middleware';
 import { corsFilter } from './middleware/cors-filter';
@@ -38,11 +38,11 @@ app.use(morgan('combined', { stream: logStream}));
 app.use(sessionMiddleware);
 app.use(corsFilter);
 app.use('/', express.json());
-app.use('/employees', EmployeeRouter);
+app.use('/users', UserRouter);
 app.use('/books', BookRouter);
 app.use('/authors', AuthorRouter);
-app.use('/customers', CustomerRouter);
-app.use('/auth', AuthRouter)
+app.use('/transactions', TransactionRouter);
+app.use('/auth', AuthRouter);
 
 app.listen(8080, () => {
     console.log('Application running and listening at: http://localhost:8080');

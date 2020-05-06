@@ -4,7 +4,7 @@ import { Principal } from '../dtos/principal';
 
 export const AuthRouter = express.Router();
 
-const empService = AppConfig.empService;
+const userService = AppConfig.userService;
 
 AuthRouter.get('', (req, resp) => {
     delete req.session.principal;
@@ -16,8 +16,8 @@ AuthRouter.post('', async (req, resp) => {
     try {
 
         const { username, password } = req.body;
-        let authEmp = await empService.authenticateEmp(username, password);
-        let payload = new Principal(authEmp.id, authEmp.username, authEmp.role);
+        let authUser = await userService.authenticateUser(username, password);
+        let payload = new Principal(authUser.id, authUser.username, authUser.role_name);
         req.session.principal = payload;
         resp.status(200).json(payload);
         
