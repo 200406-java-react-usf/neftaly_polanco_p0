@@ -159,11 +159,4 @@ export class UserRepository implements CrudRepository<User> {
              client && client.release();
          }
     }
-
-    // private removePassword(user: User): User {
-    //     let user = {...user};
-    //     delete user.password;
-    //     return user;   
-    // }
-
 }

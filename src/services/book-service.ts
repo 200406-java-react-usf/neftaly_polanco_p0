@@ -112,7 +112,7 @@ export class BookService {
     async deleteBookById(id: number): Promise<boolean> {
         
         try {
-           
+                       
            await this.bookRepo.deleteById(id);
             
         } catch (e) {

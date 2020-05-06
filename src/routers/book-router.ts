@@ -57,7 +57,7 @@ BookRouter.delete('/:id', UserGuard, async (req, resp) => {
     const id = +req.params.id;
     try {
         let deleteBook = await bookService.deleteBookById(id);
-               return resp.status(202).send(true);
+        return resp.status(202).send(true);
     } catch (e) {
         return resp.status(e.statusCode).json(e);
     }

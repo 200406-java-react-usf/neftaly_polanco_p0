@@ -185,4 +185,111 @@ describe('bookService', () => {
 
     });
 
+    test('should resolve to Book when getBookByUniqueKey is given a valid an known object', async () => {
+
+        // Arrange
+        expect.assertions(2);
+        
+        Validator.isValidId = jest.fn().mockReturnValue(true);
+
+        mockRepo.getBookByUniqueKey = jest.fn().mockImplementation((queryObj: any) => {
+            return new Promise<Book>((resolve) => resolve(mockBooks[queryObj]));
+        });
+
+
+        // Act
+        let result = await sut.getBookById(1);
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result.id).toBe(1);
+        
+
+    });
+
+    test('should reject with BadRequestError when getBookById is given a invalid value as an id (decimal)', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        mockRepo.getById = jest.fn().mockReturnValue(false);
+
+        // Act
+        try {
+            await sut.getBookById(3.14);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof BadRequestError).toBe(true);
+        }
+
+    });
+
+    test('should reject with BadRequestError when getBookById is given a invalid value as an id (zero)', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        mockRepo.getById = jest.fn().mockReturnValue(false);
+
+        // Act
+        try {
+            await sut.getBookById(0);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof BadRequestError).toBe(true);
+        }
+
+    });
+
+    test('should reject with BadRequestError when getBookById is given a invalid value as an id (NaN)', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        mockRepo.getById = jest.fn().mockReturnValue(false);
+
+        // Act
+        try {
+            await sut.getBookById(NaN);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof BadRequestError).toBe(true);
+        }
+
+    });
+
+    test('should reject with BadRequestError when getBookById is given a invalid value as an id (negative)', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        mockRepo.getById = jest.fn().mockReturnValue(false);
+
+        // Act
+        try {
+            await sut.getBookById(-2);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof BadRequestError).toBe(true);
+        }
+
+    });
+
+    test('should reject with ResourceNotFoundError if getByid is given an unknown id', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        mockRepo.getById = jest.fn().mockReturnValue(true);
+
+        // Act
+        try {
+            await sut.getBookById(9999);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof ResourceNotFoundError).toBe(true);
+        }
+
+    });
+
 });

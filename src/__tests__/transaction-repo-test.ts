@@ -115,4 +115,53 @@ describe('transactionRepo', () => {
 
     });
 
+    test('should resolve to a Transaction object when getTransactionByUniqueKey retrieves a record from data source', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+        let mockTransaction = new Transaction(1, 'myTransaction', 30, new Date());
+         (mockMapper.mapTransactionResultSet as jest.Mock).mockReturnValue(mockTransaction);
+
+        // Act
+        let result = await sut.getTransactionByUniqueKey('date', 'mydate');
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof Transaction).toBe(true);
+
+    });
+
+    test('should add a new transaction when save is provided with valid input', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+    
+        let mockTransaction = new Transaction(1, 'myTransaction', 30, new Date());
+        (mockMapper.mapTransactionResultSet as jest.Mock).mockReturnValue(mockTransaction);
+    
+        // Act
+        let result = await sut.save(mockTransaction);
+    
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof Transaction).toBe(true);
+    
+    });
+
+    test('should delete a transaction when deleteById is provided with a transaction id', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+        // Act
+        let result = await sut.deleteById(1);
+    
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result).toBe(true);
+    
+    });
+
+
 });

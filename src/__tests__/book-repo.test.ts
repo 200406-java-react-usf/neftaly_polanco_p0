@@ -101,8 +101,8 @@ describe('bookRepo', () => {
         // Arrange
         expect.hasAssertions();
 
-        let mockBook = new Book(1, 'myBook', 30);
-        (mockMapper.mapBookResultSet as jest.Mock).mockReturnValue(mockBook);
+         let mockBook = new Book(1, 'myBook', 30);
+         (mockMapper.mapBookResultSet as jest.Mock).mockReturnValue(mockBook);
 
         // Act
         let result = await sut.getById(1);
@@ -111,6 +111,54 @@ describe('bookRepo', () => {
         expect(result).toBeTruthy();
         expect(result instanceof Book).toBe(true);
 
+    });
+
+    test('should resolve to a Book object when getBookByUniqueKey retrieves a record from data source', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+         let mockBook = new Book(1, 'myBook', 30);
+         (mockMapper.mapBookResultSet as jest.Mock).mockReturnValue(mockBook);
+
+        // Act
+        let result = await sut.getBookByUniqueKey('title', 'myBook');
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof Book).toBe(true);
+
+    });
+
+    test('should add a new book when save is provided with valid input', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+    
+        let mockBook = new Book(1, 'myBook', 30);
+        (mockMapper.mapBookResultSet as jest.Mock).mockReturnValue(mockBook);
+    
+        // Act
+        let result = await sut.save(mockBook);
+    
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof Book).toBe(true);
+    
+    });
+
+    test('should delete a book when deleteById is provided with a book id', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+        // Act
+        let result = await sut.deleteById(1);
+    
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result).toBe(true);
+    
     });
 
 });

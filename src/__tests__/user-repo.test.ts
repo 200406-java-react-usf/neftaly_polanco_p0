@@ -117,4 +117,69 @@ describe('userRepo', () => {
 
     });
 
+    test('should resolve to a User object when getUserByCredentials retrieves a record from data source', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+        let mockUser = new User(1, 'un', 'pw', 'fn', 'ln', 'phone', 'email', 'locked');
+        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+
+        // Act
+        let result = await sut.getUserByCredentials('un', 'pw');
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof User).toBe(true);
+
+    });
+
+    test('should resolve to a User object when getUserByUniqueKey retrieves a record from data source', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+        let mockUser = new User(1, 'un', 'pw', 'fn', 'ln', 'phone', 'email', 'locked');
+         (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+
+        // Act
+        let result = await sut.getUserByUniqueKey('username', 'myUser');
+
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof User).toBe(true);
+
+    });
+
+    test('should add a new user when save is provided with valid input', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+    
+        let mockUser = new User(1, 'un', 'pw', 'fn', 'ln', 'phone', 'email', 'locked');
+        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+    
+        // Act
+        let result = await sut.save(mockUser);
+    
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof User).toBe(true);
+    
+    });
+
+    test('should delete a user when deleteById is provided with a user id', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+
+        // Act
+        let result = await sut.deleteById(1);
+    
+        // Assert
+        expect(result).toBeTruthy();
+        expect(result).toBe(true);
+    
+    });
+
 });

@@ -88,7 +88,7 @@ export class BookRepository implements CrudRepository<Book> {
         
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where ae.${key} = $1`;
+            let sql = `${this.baseQuery} where b.${key} = $1`;
             let rs = await client.query(sql, [val]);
             return mapBookResultSet(rs.rows[0]);
         } catch (e) {
@@ -123,7 +123,7 @@ export class BookRepository implements CrudRepository<Book> {
 
         try {
             client = await connectionPool.connect();
-            let sql = `delete from Books where b.id = $1`;
+            let sql = `delete from b where b.id = $1`;
             let rs = await client.query(sql, [id]);
             if(rs) {
                 return true;
