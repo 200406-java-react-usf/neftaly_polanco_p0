@@ -5,12 +5,18 @@ import {
 } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
-import { mapTransactionResultSet } from '../util/transactions';
+import { mapTransactionResultSet } from '../util/transaction-result-set-mapper';
 
 export class TransactionRepository implements CrudRepository<Transaction> {
 
     baseQuery = `
-        select * from Transactions tr
+            select 
+            tr.id,
+            tr.date,
+            us.username as username
+        from Transactions tr        
+        join users us on 
+        tr.user_id = us.id
     `;
     // get all transactions
     async getAll(): Promise<Transaction[]> {
@@ -58,10 +64,10 @@ export class TransactionRepository implements CrudRepository<Transaction> {
             let total = 'sel'
            
             let sql = `  
-                insert into Transactions (total, username) where id = 
-                values ($1, $2) returning id
+                insert into tr (user_id) 
+                values ($1) returning id
             `;
-            let rs = await client.query(sql, [newTransaction.total, newTransaction.username]);
+            let rs = await client.query(sql, [newTransaction.username]);
             
             newTransaction.id = rs.rows[0].id;
             
@@ -82,7 +88,7 @@ export class TransactionRepository implements CrudRepository<Transaction> {
         
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where ae.${key} = $1`;
+            let sql = `${this.baseQuery} where tr.${key} = $1`;
             let rs = await client.query(sql, [val]);
             return mapTransactionResultSet(rs.rows[0]);
         } catch (e) {

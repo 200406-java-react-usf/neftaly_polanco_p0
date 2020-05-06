@@ -11,7 +11,7 @@ export function mapTransactionResultSet(resultSet: TransactionSchema): Transacti
         resultSet.id,
         resultSet.username,
         resultSet.total,
-        resultSet.transaction_date,
+        resultSet.date,
         
     );
 }

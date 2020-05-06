@@ -8,7 +8,7 @@ import { UserRouter } from './routers/user-router';
 import { AuthRouter } from './routers/auth-router';
 import { BookRouter } from './routers/book-router';
 import { TransactionRouter } from './routers/transaction-router';
-import { AuthorRouter } from './routers/author-router';
+// import { AuthorRouter } from './routers/author-router';
 import { sessionMiddleware } from './middleware/session-middleware';
 import { corsFilter } from './middleware/cors-filter';
 import { Pool } from 'pg';
@@ -40,7 +40,7 @@ app.use(corsFilter);
 app.use('/', express.json());
 app.use('/users', UserRouter);
 app.use('/books', BookRouter);
-app.use('/authors', AuthorRouter);
+// app.use('/authors', AuthorRouter);
 app.use('/transactions', TransactionRouter);
 app.use('/auth', AuthRouter);
 

@@ -3,7 +3,7 @@ import express from 'express';
 import AppConfig from '../config/app';
 import { isEmptyObject } from '../util/validator';
 import { ParsedUrlQuery } from 'querystring';
-import { UserGuard } from '../middleware/auth-middleware';
+import { UserGuard, adminGuard } from '../middleware/auth-middleware';
 
 export const TransactionRouter = express.Router();
 
@@ -54,7 +54,7 @@ TransactionRouter.post('', UserGuard, async (req, resp) => {
 
 });
 
-TransactionRouter.delete('/id', UserGuard, async (req, resp) => {
+TransactionRouter.delete('/:id', adminGuard, async (req, resp) => {
     const id = +req.params.id;
     try {
         let deleteTransaction = await transactionService.deleteTransactionById(id);

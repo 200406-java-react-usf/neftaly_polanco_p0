@@ -10,13 +10,8 @@ export function mapBookResultSet(resultSet: BookSchema): Book {
 
     return new Book(
         resultSet.id,
-        resultSet.title,  
-        resultSet.stock, 
-        resultSet.price,  
-        resultSet.genres,
-        resultSet.authors,
-        resultSet.buyers,        
-        resultSet.transactionId,
+        resultSet.title,   
+        resultSet.price,         
     );
 }
 

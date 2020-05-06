@@ -3,16 +3,15 @@ import express from 'express';
 import AppConfig from '../config/app';
 import { isEmptyObject } from '../util/validator';
 import { ParsedUrlQuery } from 'querystring';
-import { adminGuard } from '../middleware/auth-middleware';
+import { adminGuard, UserGuard } from '../middleware/auth-middleware';
 
 export const UserRouter = express.Router();
 
 const userService = AppConfig.userService;
 
-UserRouter.get('', adminGuard, async (req, resp) => {
+UserRouter.get('', UserGuard, async (req, resp) => {
 
     try {
-
         let reqURL = url.parse(req.url, true);
 
         if(!isEmptyObject<ParsedUrlQuery>(reqURL.query)) {
@@ -29,7 +28,7 @@ UserRouter.get('', adminGuard, async (req, resp) => {
 
 });
 
-UserRouter.get('/:id', async (req, resp) => {
+UserRouter.get('/:id', UserGuard, async (req, resp) => {
     const id = +req.params.id;
     try {
         let payload = await userService.getUserById(id);
@@ -39,7 +38,7 @@ UserRouter.get('/:id', async (req, resp) => {
     }
 });
 
-UserRouter.post('', async (req, resp) => {
+UserRouter.post('', adminGuard, async (req, resp) => {
 
     console.log('POST REQUEST RECEIVED AT /users');
     console.log(req.body);
@@ -52,7 +51,7 @@ UserRouter.post('', async (req, resp) => {
 
 });
 
-UserRouter.delete('/id', adminGuard, async (req, resp) => {
+UserRouter.delete('/:id', adminGuard, async (req, resp) => {
     const id = +req.params.id;
     try {
         let deleteUser = await userService.deleteUserById(id);

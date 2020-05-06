@@ -2,7 +2,7 @@ export class Transaction {
     id: number;
     username: string;
     total: number;
-	transaction_date: Date;
+	date: Date;
     ;
 	
 
@@ -10,7 +10,7 @@ export class Transaction {
         this.id = id;
         this.username = un;
         this.total = total;       
-        this.transaction_date = td;
+        this.date = td;
         
     }
 }

@@ -17,7 +17,7 @@ export class BookRepository implements CrudRepository<Book> {
 
     baseQuery = `
         select *
-        from Books 
+        from Books b
         `;
 
     //get all books
@@ -61,17 +61,13 @@ export class BookRepository implements CrudRepository<Book> {
         let client: PoolClient;
 
         try {
-            client = await connectionPool.connect();
-
-            let bookAuthors = {...newBook.authors}
+            client = await connectionPool.connect();            
            
             let sql = `
-                insert into Books (title, stock, price) 
-                values ($1, $2, $3) returning id
-                insert into Book_Genres values ($4, $5) returning id
-                insert into Written_By values ($1, $6)
+                insert into Books (title, book_price) 
+                values ($1, $2) returning id                
             `;
-            let rs = await client.query(sql, [newBook.title, newBook.stock, newBook.price, newBook.genres, newBook.authors]);
+            let rs = await client.query(sql, [newBook.title, newBook.price]);
             
             newBook.id = rs.rows[0].id;
             
@@ -128,8 +124,11 @@ export class BookRepository implements CrudRepository<Book> {
         try {
             client = await connectionPool.connect();
             let sql = `delete from Books where b.id = $1`;
-            await client.query(sql, []);
-            return true;
+            let rs = await client.query(sql, [id]);
+            if(rs) {
+                return true;
+            }
+            return false;
         } catch (e) {
             throw new InternalServerError();
         } finally {

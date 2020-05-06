@@ -1,122 +1,122 @@
-import { Author } from "../models/author";
-import { AuthorRepository } from "../repos/author-repo";
-import { ResourceNotFoundError, BadRequestError, ResourcePersistenceError, AuthenticationError } from "../errors/errors";
-import { isValidId, isEmptyObject, isValidObject, isPropertyOf,  } from "../util/validator";
+// import { Author } from "../models/author";
+// import { AuthorRepository } from "../repos/author-repo";
+// import { ResourceNotFoundError, BadRequestError, ResourcePersistenceError, AuthenticationError } from "../errors/errors";
+// import { isValidId, isEmptyObject, isValidObject, isPropertyOf,  } from "../util/validator";
 
 
 
-export class AuthorService {
-    constructor(private authorRepo: AuthorRepository) {
-        this.authorRepo = authorRepo;
-    }
+// export class AuthorService {
+//     constructor(private authorRepo: AuthorRepository) {
+//         this.authorRepo = authorRepo;
+//     }
 
-    //getting all authors
-    async getAllAuthors(): Promise<Author[]> {
-        let authors = await this.authorRepo.getAll();
+//     //getting all authors
+//     async getAllAuthors(): Promise<Author[]> {
+//         let authors = await this.authorRepo.getAll();
 
-        if (authors.length == 0) {
-            throw new ResourceNotFoundError();
-        }
-        return authors
-    }
+//         if (authors.length == 0) {
+//             throw new ResourceNotFoundError();
+//         }
+//         return authors
+//     }
 
-    //getting author by id
-    async getAuthorById(id: number): Promise<Author> {
-        if (!isValidId(id)) {
-            throw new BadRequestError();
-        }
+//     //getting author by id
+//     async getAuthorById(id: number): Promise<Author> {
+//         if (!isValidId(id)) {
+//             throw new BadRequestError();
+//         }
 
-        let author = await this.authorRepo.getById(id);
+//         let author = await this.authorRepo.getById(id);
 
-        //ensuring we did not get an empty object
-        if(isEmptyObject(author)) {
-            throw new ResourceNotFoundError();
-        }
+//         //ensuring we did not get an empty object
+//         if(isEmptyObject(author)) {
+//             throw new ResourceNotFoundError();
+//         }
 
-        return  author;
-    }
-        //adding new author
-        async addNewAuthor(newAuthor: Author): Promise<Author> {
+//         return  author;
+//     }
+//         //adding new author
+//         async addNewAuthor(newAuthor: Author): Promise<Author> {
         
-            try {
+//             try {
     
-                //making sure newAuthor object is valid
-                if (!isValidObject(newAuthor, 'id')) {
-                    throw new BadRequestError('Invalid property values found in provided author.');
-                }
+//                 //making sure newAuthor object is valid
+//                 if (!isValidObject(newAuthor, 'id')) {
+//                     throw new BadRequestError('Invalid property values found in provided author.');
+//                 }
                 
-                const persistedAuthor = await this.authorRepo.save(newAuthor);
+//                 const persistedAuthor = await this.authorRepo.save(newAuthor);
     
-                return persistedAuthor;
+//                 return persistedAuthor;
     
-            } catch (e) {
-                throw e
-            }
+//             } catch (e) {
+//                 throw e
+//             }
     
-        }
+//         }
 
-        async getAuthorByUniqueKey(queryObj: any): Promise<Author> {
+//         async getAuthorByUniqueKey(queryObj: any): Promise<Author> {
 
-            try {
-                let queryKeys = Object.keys(queryObj);
+//             try {
+//                 let queryKeys = Object.keys(queryObj);
     
-                if(!queryKeys.every(key => isPropertyOf(key, Author))) {
-                    throw new BadRequestError();
-                }
+//                 if(!queryKeys.every(key => isPropertyOf(key, Author))) {
+//                     throw new BadRequestError();
+//                 }
     
-                //searching by only one key (at least for now)
-                let key = queryKeys[0];
-                let val = queryObj[key];
+//                 //searching by only one key (at least for now)
+//                 let key = queryKeys[0];
+//                 let val = queryObj[key];
     
-                //reuse getById logic if given key is id
-                if (key === 'id') {
-                    return await this.getAuthorById(+val);
-                }
+//                 //reuse getById logic if given key is id
+//                 if (key === 'id') {
+//                     return await this.getAuthorById(+val);
+//                 }
     
-                // throw error if key is value is not valid
-                if(!isValidId(val)) {
-                    throw new BadRequestError();
-                }
+//                 // throw error if key is value is not valid
+//                 if(!isValidId(val)) {
+//                     throw new BadRequestError();
+//                 }
     
-                let author = await this.authorRepo.getAuthorByUniqueKey(key, val);
+//                 let author = await this.authorRepo.getAuthorByUniqueKey(key, val);
                 
-                if(isEmptyObject(author)) {
-                    throw new ResourceNotFoundError();
-                }
+//                 if(isEmptyObject(author)) {
+//                     throw new ResourceNotFoundError();
+//                 }
     
-                return author;
+//                 return author;
     
-            } catch (e) {
-            throw e;
-            }
-        }
+//             } catch (e) {
+//             throw e;
+//             }
+//         }
 
-    //update an existing author
-    async updateAuthor(updatedAuthor: Author): Promise<boolean> {
+//     //update an existing author
+//     async updateAuthor(updatedAuthor: Author): Promise<boolean> {
         
-        try {
+//         try {
 
-            if (!isValidObject(updatedAuthor)) {
-                throw new BadRequestError('Invalid user provided (invalid values found).');
-            }
+//             if (!isValidObject(updatedAuthor)) {
+//                 throw new BadRequestError('Invalid user provided (invalid values found).');
+//             }
 
-            return await this.authorRepo.update(updatedAuthor);
-        } catch (e) {
-            throw e;
-        }
+//             return await this.authorRepo.update(updatedAuthor);
+//         } catch (e) {
+//             throw e;
+//         }
 
-    }
+//     }
 
-    //deleting an author
-    async deleteAuthorById(id: number): Promise<boolean> {
+//     //deleting an author
+//     async deleteAuthorById(id: number): Promise<boolean> {
         
-        try {
+//         try {
            
-           await this.authorRepo.deleteById(id);
+//            await this.authorRepo.deleteById(id);
             
-        } catch (e) {
-            throw e;
-        }
-        return true;
-    }
-}
+//         } catch (e) {
+//             throw e;
+//         }
+//         return true;
+//     }
+// }
