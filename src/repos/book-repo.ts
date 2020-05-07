@@ -88,7 +88,7 @@ export class BookRepository implements CrudRepository<Book> {
         
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where b.${key} = $1`;
+            let sql = `${this.baseQuery} where b.${key} = ${val}`;
             let rs = await client.query(sql, [val]);
             return mapBookResultSet(rs.rows[0]);
         } catch (e) {
@@ -98,15 +98,15 @@ export class BookRepository implements CrudRepository<Book> {
         }
     }
 
-    //update book work in progress
+    //update book 
     async update(updatedBook: Book): Promise<boolean> {
         
         let client: PoolClient;
 
         try {
             client = await connectionPool.connect();
-            let sql = ``;
-            let rs = await client.query(sql, []);
+            let sql = `update b set book_price = $2 where id = $2`;
+            let rs = await client.query(sql, [updatedBook.price, updatedBook.id]);
             return true;
         } catch (e) {
             throw new InternalServerError();
@@ -123,12 +123,10 @@ export class BookRepository implements CrudRepository<Book> {
 
         try {
             client = await connectionPool.connect();
-            let sql = `delete from b where b.id = $1`;
-            let rs = await client.query(sql, [id]);
-            if(rs) {
-                return true;
-            }
-            return false;
+            let sql = `delete from b where id = $1`;
+            let rs = await client.query(sql);            
+            return (true);
+            
         } catch (e) {
             throw new InternalServerError();
         } finally {

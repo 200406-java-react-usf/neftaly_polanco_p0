@@ -27,7 +27,6 @@ BookRouter.get('', async (req, resp) => {
     } catch (e) {
         resp.status(e.statusCode).json(e);
     }
-
 });
 
 BookRouter.get('/:id', async (req, resp) => {
@@ -39,6 +38,8 @@ BookRouter.get('/:id', async (req, resp) => {
         return resp.status(e.statusCode).json(e);
     }
 });
+
+
 
 BookRouter.post('', UserGuard, async (req, resp) => {
 
@@ -53,11 +54,24 @@ BookRouter.post('', UserGuard, async (req, resp) => {
 
 });
 
+BookRouter.put('/:id', UserGuard, async (req, resp) => {
+
+    console.log('PUT REQUEST RECEIVED AT /books');
+    console.log(req.body);
+    try {
+        let newBook = await bookService.updateBook(req.body);
+        return resp.status(201).json(newBook);
+    } catch (e) {
+        return resp.status(e.statusCode).json(e);
+    }
+
+});
+
 BookRouter.delete('/:id', UserGuard, async (req, resp) => {
     const id = +req.params.id;
     try {
-        let deleteBook = await bookService.deleteBookById(id);
-        return resp.status(202).send(true);
+        await bookService.deleteBookById(id);
+        return resp.status(200).json(id);
     } catch (e) {
         return resp.status(e.statusCode).json(e);
     }
