@@ -111,13 +111,12 @@ export class BookService {
     //deleting a book
     async deleteBookById(id: number): Promise<boolean> {
         
-        try {
+            let user = await this.bookRepo.getById(id)
                        
-           await this.bookRepo.deleteById(id);
+          let isDeleted = await this.bookRepo.deleteById(user.id);
+          return isDeleted;
             
-        } catch (e) {
-            throw e;
-        }
-        return true;
+      
+        
     }
 }

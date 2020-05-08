@@ -101,9 +101,9 @@ export class UserRepository implements CrudRepository<User> {
 
             let role_id = (await client.query('select id from Roles where role_name = $1', [newUser.role_name])).rows[0].id;
 
-            let sql = `insert into us (first_name, last_name, username, 
+            let sql = `insert into users (first_name, last_name, username, 
                 password, phone, email, role_id) 
-                values ($1, $2, $3, $4, $5, $6, $7) returning id` ;
+                values ($1, $2, $3, $4, $5, $6, $7) returning id ` ;
 
             let rs = (await client.query(sql, [newUser.username, newUser.password, 
                 newUser.firstName, newUser.lastName,  
@@ -124,18 +124,21 @@ export class UserRepository implements CrudRepository<User> {
     async update(updatedUser: User): Promise<boolean> {
         
         let client: PoolClient;
-        let queryKeys = Object.keys(updatedUser);
-        if(!queryKeys.every(key => isPropertyOf(key, User))) {
-            throw new BadRequestError();
-        }
+
+        let role_id = (await client.query('select id from Roles where role_name = $1', [updatedUser.role_name])).rows[0].id;
+
 
         try {
             client = await connectionPool.connect();
-            let sql = `update Users set $1 = $2 where id = $3`;
-            let rs = await client.query(sql, ['username', updatedUser, updatedUser.id]);
-            if(rs)
+            let sql = `update Users set (first_name, last_name, username, 
+                password, phone, email, role_id) = ($1, $2, $3, $4, $5, $6, $7) where id = ${updatedUser}.id`;
+                
+            let rs = await client.query(sql, [updatedUser.username, updatedUser.password, 
+                updatedUser.firstName, updatedUser.lastName,  
+                updatedUser.phone, updatedUser.email, role_id]);
+
             return true;
-            else return false;
+            
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -149,7 +152,7 @@ export class UserRepository implements CrudRepository<User> {
             
          try {
              client = await connectionPool.connect();
-             let sql = 'delete from us where id = $1';
+             let sql = 'delete from users where id = $1';
              await client.query(sql, [id]);                
              return true;
              

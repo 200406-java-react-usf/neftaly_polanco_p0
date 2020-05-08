@@ -11,7 +11,7 @@ export function mapBookResultSet(resultSet: BookSchema): Book {
     return new Book(
         resultSet.id,
         resultSet.title,   
-        resultSet.price,         
+        resultSet.book_price,         
     );
 }
 

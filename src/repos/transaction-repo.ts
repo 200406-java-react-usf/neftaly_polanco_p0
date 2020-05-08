@@ -122,9 +122,16 @@ export class TransactionRepository implements CrudRepository<Transaction> {
         let client: PoolClient;
 
         try {
-            client = await connectionPool.connect();
-            let sql = `delete from Transactions where tr.id = $1`;
-            await client.query(sql, []);
+            client = await connectionPool.connect();   
+                     
+            //console.log('made it to client await')
+
+            let sql = `delete from transactions where id = $1`;
+
+            //console.log('made it to sql');
+
+            let rs = await client.query(sql, [id]);
+            
             return true;
         } catch (e) {
             throw new InternalServerError();

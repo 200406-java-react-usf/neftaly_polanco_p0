@@ -115,10 +115,15 @@
 //         let client: PoolClient;
 
 //         try {
-//             client = await connectionPool.connect();
-//             let sql = `delete from Authors where id = $1`;
-//             await client.query(sql, []);
-//             return true;
+//             client = await connectionPool.connect();   
+                     
+//             console.log('made it to client await')
+
+//             let sql = `delete from author where id = $1`;
+
+//             console.log('made it to sql');
+
+//             let rs = await client.query(sql, [id]);
 //         } catch (e) {
 //             throw new InternalServerError();
 //         } finally {

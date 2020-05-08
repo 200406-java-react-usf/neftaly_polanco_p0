@@ -88,7 +88,7 @@ export class BookRepository implements CrudRepository<Book> {
         
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where b.${key} = ${val}`;
+            let sql = `${this.baseQuery} where books.${key} = ${val}`;
             let rs = await client.query(sql, [val]);
             return mapBookResultSet(rs.rows[0]);
         } catch (e) {
@@ -105,9 +105,10 @@ export class BookRepository implements CrudRepository<Book> {
 
         try {
             client = await connectionPool.connect();
-            let sql = `update b set book_price = $2 where id = $2`;
+            let sql = `update books set book_price = $1 where id = $2`;
             let rs = await client.query(sql, [updatedBook.price, updatedBook.id]);
             return true;
+
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -120,14 +121,26 @@ export class BookRepository implements CrudRepository<Book> {
     async deleteById(id: number): Promise<boolean> {
 
         let client: PoolClient;
+        // console.log('made it here')
 
         try {
-            client = await connectionPool.connect();
-            let sql = `delete from b where id = $1`;
-            let rs = await client.query(sql);            
-            return (true);
+
+            // console.log('made it to try')
+
+            client = await connectionPool.connect();   
+
+            //console.log('made it to client await')
+
+            let sql = `delete from books where id = $1`;
+
+            //console.log('made it to sql');
+
+            let rs = await client.query(sql, [id]);            
+
+            return true;            
             
         } catch (e) {
+            
             throw new InternalServerError();
         } finally {
             client && client.release();

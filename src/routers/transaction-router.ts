@@ -54,6 +54,19 @@ TransactionRouter.post('', UserGuard, async (req, resp) => {
 
 });
 
+TransactionRouter.put('/:id', adminGuard, async (req, resp) => {
+
+    console.log('PUT REQUEST RECEIVED AT /books');
+    console.log(req.body);
+    try {
+        let updatedTransaction = await transactionService.updateTransaction(req.body);
+        return resp.status(201).json(updatedTransaction);
+    } catch (e) {
+        return resp.status(e.statusCode).json(e);
+    }
+
+});
+
 TransactionRouter.delete('/:id', adminGuard, async (req, resp) => {
     const id = +req.params.id;
     try {

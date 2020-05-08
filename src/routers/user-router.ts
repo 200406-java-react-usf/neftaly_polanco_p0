@@ -60,3 +60,16 @@ UserRouter.delete('/:id', adminGuard, async (req, resp) => {
         return resp.status(e.statusCode).json(e);
     }
 });
+
+UserRouter.put('/:id', adminGuard, async (req, resp) => {
+
+    console.log('PUT REQUEST RECEIVED AT /books');
+    console.log(req.body);
+    try {
+        let updatedUser = await userService.updateUser(req.body);
+        return resp.status(201).json(updatedUser);
+    } catch (e) {
+        return resp.status(e.statusCode).json(e);
+    }
+
+});

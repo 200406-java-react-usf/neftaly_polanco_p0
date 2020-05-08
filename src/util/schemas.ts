@@ -12,7 +12,7 @@ export interface UserSchema {
 export interface BookSchema {
     id: number;
     title: string;    
-    price: number;
+    book_price: number;
 }
 
 // export interface AuthorSchema {
